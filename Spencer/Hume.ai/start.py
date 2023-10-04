@@ -17,7 +17,29 @@ uuids = ['49e2ab1c-4e61-4a90-b109-4c216e9fd7a4',
 
 pages = full[full['UUID'].isin(uuids)]
 hume_api_key = 'hRRgvtBFS46E9qOZg28eGZiAFzZxeiHwxGmvbV49GRTLNHpo'
+#%%
 
+#Turn 10 pages into txt files for URL link
+import os
+output_directory = 'text_files'
+os.makedirs(output_directory, exist_ok=True)
+
+
+series = pages['Text Only Transcript']
+for index, text_item in enumerate(series):
+    filename = f'UUID:{index + 1}.txt'
+    filepath = os.path.join(output_directory, filename)
+    
+    with open(filepath, 'w') as file:
+        file.write(text_item)
+
+    print(f'Saved {filename}')
+
+#%%
+
+urls = []
+for i in range(2):
+    urls.append('https://raw.githubusercontent.com/wilfordwoodruff/Emotional_Analysis/main/Spencer/Hume.ai/text_files/text_item_' + str(i+1) + '.txt')
 
 #%%
 from utilities import print_emotions, print_sentiment
@@ -26,7 +48,7 @@ from hume import HumeBatchClient
 from hume.models.config import LanguageConfig
 
 client = HumeBatchClient(hume_api_key)
-urls = ['']
+#urls = ['']
 config = LanguageConfig(sentiment={})
 job = client.submit_job(urls, [config])
 
@@ -49,8 +71,8 @@ for source in full_predictions:
                 print_sentiment(chunk["sentiment"])
                 print()
 # %%
-job.download_predictions("url_test.json")
-job.download_artifacts("url_test.zip")
+job.download_predictions("two_files.json")
+job.download_artifacts("two_files.zip")
 print(f"\nPredictions downloaded to predictions.json")
 # %%
 scores= pd.read_excel('journal_1_averages.xlsx')
