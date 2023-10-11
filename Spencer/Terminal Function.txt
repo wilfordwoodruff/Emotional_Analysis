@@ -1,1 +1,0 @@
- py avgEmoValues.py --dataPath just_day_text.csv --lexPath all_emotions.csv --lexNames anger anticipation disgust fear joy negative positive sadness surprise trust --savePath NRC-Emotion-Lexicon	

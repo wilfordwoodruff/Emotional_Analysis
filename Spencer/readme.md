@@ -1,1 +1,0 @@
-This reorganizes the Journals so that each row is a single date with the transcript of that date's journal entry. Days with entries spanning multiple pages currently have multiple rows, so that we can keep each page's ID number.
