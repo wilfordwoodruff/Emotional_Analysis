@@ -35,45 +35,6 @@ for source in full_predictions:
                 print()
 # %%
 job.download_predictions("full_text.json")
-#job.download_artifacts("full_text.zip")
+job.download_artifacts("full_text.zip")
 print(f"\nPredictions downloaded to predictions.json")
-# %%
-import pandas as pd
-
-data = {
-    'Word': ['word1', 'word2', 'NEW_ENTRY', 'word3', 'word4', 'NEW_ENTRY', 'word5', 'word6', 'NEW_ENTRY'],
-    'Score': [1.0, 2.0, 0.0, 3.0, 4.0, 0.0, 2.5, 1.5, 0.0]
-}
-
-results = pd.DataFrame(data)
-
-print(results)
-
-#df = pd.read_json('full_text.json')
-
-# Initialize variables for grouping
-current_group = 0
-group_scores = []
-
-# Create a new column 'Group' to identify groups based on 'Word' column
-results['Entry'] = 0
-
-# Iterate through the rows and assign groups
-for index, row in results.iterrows():
-    if row['Word'] == 'NEW_ENTRY':
-        current_group += 1
-    results.at[index, 'Entry'] = current_group
-
-# Filter out rows with 'NEW_ENTRY' in 'Word' column
-df = results[results['Word'] != 'NEW_ENTRY']
-
-# Group by 'Group' and calculate the average score for each group
-result = df.groupby('Entry').mean().reset_index()
-
-# Reset index for the result DataFrame
-result.reset_index(drop=True, inplace=True)
-
-# Print the result
-print(result)
-
 # %%
