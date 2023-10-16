@@ -5,7 +5,7 @@ import string as str
 import numpy as np
 import matplotlib.pyplot as plt
 
-all=pd.read_csv('RawTextScores.csv')
+all=pd.read_csv('../NRC-Emotion-Lexicon/RawTextScores.csv')
 all_s = all[pd.notna(all['First Date'])].sample(n=500).sort_values('First Date')
 
 #%%
@@ -27,7 +27,7 @@ plt.show()
 
 #%%
 #Connect back to full text
-df = pd.read_csv("../derived_data.csv")
+df = pd.read_csv("../../derived_data.csv")
 
 uuids = ['49e2ab1c-4e61-4a90-b109-4c216e9fd7a4',
 '683a68cc-fda4-43ca-a6cb-360fff93ddc8',
