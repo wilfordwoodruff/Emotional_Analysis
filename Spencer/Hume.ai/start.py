@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import os
 full = pd.read_csv('../../derived_data.csv')
-hume_api_key = os.getenv('HUME_WWP_API')
+hume_api_key = os.getenv('HUME_MY_API')#('HUME_WWP_API')
 
 #%%
 from utilities import print_emotions, print_sentiment
@@ -12,7 +12,7 @@ from hume import HumeBatchClient
 from hume.models.config import LanguageConfig
 
 client = HumeBatchClient(hume_api_key)
-url = 'https://raw.githubusercontent.com/wilfordwoodruff/Emotional_Analysis/main/Spencer/Hume.ai/first%20ten-ish.txt'
+url = 'https://raw.githubusercontent.com/wilfordwoodruff/Emotional_Analysis/main/Spencer/Hume.ai/main%203%20entries.txt'
 config = LanguageConfig(sentiment={})
 job = client.submit_job([url], [config])
 
@@ -35,7 +35,7 @@ for source in full_predictions:
                 print_sentiment(chunk["sentiment"])
                 print()
 # %%
-job.download_predictions("first10.json")
-job.download_artifacts("first10.zip")
+job.download_predictions("BIG3.json")
+job.download_artifacts("BIG3.zip")
 print(f"\nPredictions downloaded to predictions.json")
 # %%

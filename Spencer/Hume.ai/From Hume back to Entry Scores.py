@@ -1,6 +1,6 @@
 #%%
 import pandas as pd
-FILE = 'first10.csv'
+FILE = 'big3.csv'
 
 results = pd.read_csv(FILE)
 
@@ -17,6 +17,8 @@ for index, row in results.iterrows():
         current_group += 1
     results.at[index, 'Entry'] = current_group
 
+
+
 # Filter out rows with 'NEW_ENTRY' in 'Word' column
 df = results[results['Text'] != 'END_ENTRY']
 
@@ -25,9 +27,14 @@ columns = df.columns[8:61]
 result = df.groupby('Entry')[columns].mean().reset_index()
 
 result.reset_index(drop=True, inplace=True)
-print(result)
+Full_JSON = []
+for i in range(len(result)):
+    Full_JSON.append(df[df['Entry']==i].to_json(orient='split'))
+result['Full JSON'] = Full_JSON
 
-original = pd.read_csv('../../derived_data.csv')
+#print(result)
+
+original = pd.read_csv('../../derived_data.csv').UUID
 original[columns] = result[columns]
 original.to_csv('first 6 with Emotion Scores.csv')
 # %%
@@ -54,6 +61,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import seaborn as sns
+from colored_by_group import SimpleGroupedColorFunc, GroupedColorFunc
 
 remove_words = [
     "i", 'I', "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your",
@@ -67,21 +75,44 @@ remove_words = [
     "during", "before", "after", "above", "below", "to", "from", "up", "down",
     "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", '&',
     'January','February','March','April','May','June','July','August','September','October',
-    'November','December'
+    'November','December','will','when','Co','than'
 ]
 
-top_15 = top_scores[top_scores['Entry']==3].query('Word not in @remove_words').sort_values('MaxScore',ascending=False).head(n=15)
+top_15 = top_scores[top_scores['Entry']==0].query('Word not in @remove_words').sort_values('MaxScore',ascending=False).head(n=15)
 word_cloud_data = top_15[['Word', 'MaxScore', 'MaxColumn']].to_dict(orient='records')
 
-# Initialize the WordCloud
+
+#Suboptimal, but works. Matches up each word to the color of its emotion category.
+emotion_groups = pd.read_csv('Emotion Categories.csv')[['HUME','10CATEGORIES']].set_index('HUME').to_dict()['10CATEGORIES']
+group_colors = {'Contentment':'orange',
+                'Happy':'yellow',
+                'Anger': 'purple',
+                'Sadness': 'blue',
+                'Disgust': 'green',
+                'Love': 'red',
+                'Gratitude': 'orange',
+                'Fear': 'black',
+                'Confusion':'brown',
+                'Neutral':'grey'}
+color_to_words = {'orange': [],'red': [],'yellow': [],'purple': [],'blue': [],'black': [],
+    'brown': [],'grey': [],'green': []}
+for row in top_15.itertuples():
+    color = group_colors[emotion_groups[row.MaxColumn]]
+    color_to_words[color].append(row.Word)
+
+
+# Words that are not in any of the color_to_words values
+# will be colored with a grey single color function
+default_color = 'grey'
+grouped_color_func = SimpleGroupedColorFunc(color_to_words, default_color)
+
+
 wordcloud = WordCloud(width=800, height=400, background_color='white')
 wordcloud.generate_from_frequencies(frequencies={item['Word']: item['MaxScore'] for item in word_cloud_data})
+wordcloud.recolor(color_func=grouped_color_func)
 
-#Currently Unused, but makes colors?
-unique_max_columns = top_15['MaxColumn'].unique()
-color_map = {max_col: sns.color_palette("husl", n_colors=len(unique_max_columns))[i] for i, max_col in enumerate(unique_max_columns)}
-def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-    return color_map[top_15[top_15['Word'] == word]['MaxColumn'].values[0]]
+
+
 
 plt.figure(figsize=(10, 6))
 plt.imshow(wordcloud)
@@ -91,3 +122,4 @@ plt.show()
 '''
 Needs break words (the, is, &, etc.)
 '''
+# %%
