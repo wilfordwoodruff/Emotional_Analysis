@@ -20,10 +20,11 @@ def split_file(input_file, lines_per_file=200):
             output_file.writelines(file_chunk)
 
 if __name__ == "__main__":
-    input_file = '../AJ/output_file.txt'
+    input_file = '../../AJ/output_file.txt'
     
     if os.path.exists(input_file):
         split_file(input_file)
         print("File split complete.")
     else:
         print(f"{input_file} not found.")
+
