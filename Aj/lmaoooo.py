@@ -10,4 +10,4 @@ lines = [line.replace('\n', ' ') for line in lines]
 
 with open('output_file.txt', 'w') as file:
     for line in lines:
-        file.write(line + '\n')
+        file.write(line + 'ENDENTRY\n')
