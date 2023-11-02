@@ -8,7 +8,7 @@ from scipy.spatial import distance_matrix
 
 df = pd\
     .read_csv("../derived_data.csv")\
-    .dropna()\
+    .dropna(subset=["Topics"])\
     .clean_names()\
     .drop(columns=['document_type', 'parent_id', 'order', 'parent_name','uuid', 'name', 'website_url', 'short_url', 'image_url','original_transcript', 'text_only_transcript', 'people', 'places','first_date', 'dates'])\
     .reset_index(drop=True)
@@ -62,7 +62,7 @@ df_close = df\
 
 df_papers = pd\
     .read_csv("../derived_data.csv")\
-    .dropna()\
+    .dropna(subset=["Topics"])\
     .clean_names()\
     .reset_index(drop=True)
 
