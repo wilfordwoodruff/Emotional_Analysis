@@ -197,7 +197,7 @@ def every_thing():
             st.write(f":green[{return_text(wwtext, 2, 'places')}]")
 
         st.write("Transcript:")
-        st.markdown(return_text(wwtext, 1, "text_only_transcript"))
+        st.markdown(return_text(wwtext, 2, "text_only_transcript"))
 
         ###
         st.header("3rd Best Match Overall")
@@ -266,7 +266,7 @@ def every_thing():
             st.write(f":green[{return_text(people, 2, 'places')}]")
 
         st.write("Transcript:")
-        st.markdown(return_text(people, 1, "text_only_transcript"))
+        st.markdown(return_text(people, 2, "text_only_transcript"))
 
         ###
         st.header("3rd Best Match Overall")
@@ -334,7 +334,7 @@ def every_thing():
             st.write(f":green[{return_text(topics, 2, 'places')}]")
 
         st.write("Transcript:")
-        st.markdown(return_text(topics, 1, "text_only_transcript"))
+        st.markdown(return_text(topics, 2, "text_only_transcript"))
 
         ###
         st.header("3rd Best Match Overall")
@@ -402,7 +402,7 @@ def every_thing():
             st.write(f":green[{return_text(places, 2, 'places')}]")
 
         st.write("Transcript:")
-        st.markdown(return_text(places, 1, "text_only_transcript"))
+        st.markdown(return_text(places, 2, "text_only_transcript"))
 
         ###
         st.header("3rd Best Match Overall")
