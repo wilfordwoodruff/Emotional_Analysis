@@ -17,10 +17,15 @@ def every_thing():
     # Define the data
     @st.cache_data
     def load_in_data():
-        wwtext = pl.read_csv("wwtext_df.csv")
-        people = pl.read_csv("people_df.csv")
-        places = pl.read_csv("places_df.csv")
-        topics = pl.read_csv("topics_df.csv")
+        # wwtext = pl.read_csv("wwtext_df.csv")
+        # people = pl.read_csv("people_df.csv")
+        # places = pl.read_csv("places_df.csv")
+        # topics = pl.read_csv("topics_df.csv")
+
+        wwtext = pl.read_csv("wwtext_df2.csv")
+        people = pl.read_csv("people_df2.csv")
+        places = pl.read_csv("places_df2.csv")
+        topics = pl.read_csv("topics_df2.csv")
 
         return wwtext, people, places, topics
 
