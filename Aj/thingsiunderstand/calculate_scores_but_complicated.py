@@ -181,3 +181,4 @@ fix_duds(closest_indices_df(pl_topics_thresh)).write_parquet("topics_df2.parquet
 
 # later i need to kill duplicates but for now i just need sleep
 
+# lo
