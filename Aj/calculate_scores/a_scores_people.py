@@ -86,10 +86,6 @@ ndarray_wwtext = sim_maker(df, 'text_only_transcript')
 
 print("2a: People")
 pl_people = pl.DataFrame(sim_maker(df, 'text_people'))
-print("2b: Places")
-pl_places = pl.DataFrame(sim_maker(df, 'text_places'))
-print("2c: Topics")
-pl_topics = pl.DataFrame(sim_maker(df, 'text_topics'))
 
 print("3: Calculating Percentiles")
 def get_percentiles_fromdf_tolist_byrow(my_df, quantile=.75):
@@ -100,7 +96,7 @@ def get_percentiles_fromdf_tolist_byrow(my_df, quantile=.75):
             .with_row_count(name="temp_index", offset=1)\
             .melt(id_vars=["temp_index"])\
             .with_columns(pl.col("variable").cast(int))\
-            .groupby("variable")\
+            .group_by("variable")\
             .agg(pl.col("value").quantile(quantile).alias("percentile_n"))\
             .sort("variable")["percentile_n"]\
             .to_list()
@@ -109,17 +105,9 @@ def get_percentiles_fromdf_tolist_byrow(my_df, quantile=.75):
 
 print("3a: People")
 percentiles_people = get_percentiles_fromdf_tolist_byrow(pl_people)
-print("3b: Places")
-percentiles_places = get_percentiles_fromdf_tolist_byrow(pl_places)
-print("3c: Topics")
-percentiles_topics = get_percentiles_fromdf_tolist_byrow(pl_topics)
 
 print("4a: Thresholding People")
 pl_people_thresh = pl_people * (pl_people > pl.Series(percentiles_people))
-print("4b: Thresholding Places")
-pl_places_thresh = pl_places * (pl_places > pl.Series(percentiles_places))
-print("4c: Thresholding Topics")
-pl_topics_thresh = pl_topics * (pl_topics > pl.Series(percentiles_topics))
 
 print("5: Calculating Closest Indices")
 def closest_indices_df(my_df, ids = df["internal_id"]):
@@ -130,9 +118,9 @@ def closest_indices_df(my_df, ids = df["internal_id"]):
         .with_columns([df["internal_id"].alias("internal_id")])\
         .melt(id_vars=["internal_id"])\
         .sort("value", descending=True)\
-        .groupby("internal_id")\
+        .group_by("internal_id")\
         .head(4)\
-        .groupby("internal_id")\
+        .group_by("internal_id")\
         .apply(lambda group: group\
             .with_columns(pl.col("value")\
             .rank(method='ordinal', descending=True)\
@@ -145,9 +133,9 @@ def closest_indices_df_duds(my_df):
     return my_df\
         .melt(id_vars=["internal_id"])\
         .sort("value", descending=True)\
-        .groupby("internal_id")\
+        .group_by("internal_id")\
         .head(4)\
-        .groupby("internal_id")\
+        .group_by("internal_id")\
         .apply(lambda group: group\
             .with_columns(pl.col("value")\
             .rank(method='ordinal', descending=True)\
@@ -182,33 +170,5 @@ def fix_duds(ranks):
 
 print("5a: People")
 closest_people = closest_indices_df(pl_people_thresh)
-print("5b: Places")
-closest_places = closest_indices_df(pl_places_thresh)
-print("5c: Topics")
-closest_topics = closest_indices_df(pl_topics_thresh)
-
-closest_people = pl.DataFrame({
-    "internal_id": ['1', '2', '3'],
-    "closest_0": ['1', '2', '3'], 
-    "closest_1": ['1', '2', '3'],
-    "closest_2": ['1', '2', '3'],
-    "closest_3": ['1', '2', '3']})
-
-closest_places = pl.DataFrame({
-    "internal_id": ['1', '2', '3'],
-    "closest_0": ['1', '2', '3'], 
-    "closest_1": ['1', '2', '3'],
-    "closest_2": ['1', '2', '3'],
-    "closest_3": ['1', '2', '3']})
-
-closest_topics = pl.DataFrame({
-    "internal_id": ['1', '2', '3'],
-    "closest_0": ['1', '2', '3'], 
-    "closest_1": ['1', '2', '3'],
-    "closest_2": ['1', '2', '3'],
-    "closest_3": ['1', '2', '3']})
-
 
 closest_people.write_parquet("closest_people.parquet")
-closest_places.write_parquet("closest_places.parquet")
-closest_topics.write_parquet("closest_topics.parquet")

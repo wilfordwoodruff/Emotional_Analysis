@@ -7,13 +7,12 @@ import os
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-closest_people = pl.read_parquet("closest_people.parquet")
-closest_places = pl.read_parquet("closest_places.parquet")
-closest_topics = pl.read_parquet("closest_topics.parquet")
-
-unwanted_match_words = [ 
+print("1: Loading data")
+unwanted_match_words = [
+    
     "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",
     "\\|", "\\[\\[", "\\]\\]", "\\[", "\\]", "\\\\r", "\\\\t", "\\\\n"
+   
     ]
            
 nogo = "|".join(unwanted_match_words)
@@ -82,41 +81,53 @@ def sim_maker(df, var):
 
     return var_similarity
 
+print("2: Calculating Similarity Matrices")
 ndarray_wwtext = sim_maker(df, 'text_only_transcript')
 
-# def get_percentiles_fromdf_tolist_byrow(my_df, quantile=.75):
+print("2c: Topics")
+pl_topics = pl.DataFrame(sim_maker(df, 'text_topics'))
 
-#     my_df.columns = df["internal_id"].cast(str) 
+print("3: Calculating Percentiles")
+def get_percentiles_fromdf_tolist_byrow(my_df, quantile=.75):
 
-#     percentiles = my_df\
-#             .with_row_count(name="temp_index", offset=1)\
-#             .melt(id_vars=["temp_index"])\
-#             .with_columns(pl.col("variable").cast(int))\
-#             .group_by("variable")\
-#             .agg(pl.col("value").quantile(quantile).alias("percentile_n"))\
-#             .sort("variable")["percentile_n"]\
-#             .to_list()
+    my_df.columns = df["internal_id"].cast(str) 
 
-#     return percentiles
+    percentiles = my_df\
+            .with_row_count(name="temp_index", offset=1)\
+            .melt(id_vars=["temp_index"])\
+            .with_columns(pl.col("variable").cast(int))\
+            .group_by("variable")\
+            .agg(pl.col("value").quantile(quantile).alias("percentile_n"))\
+            .sort("variable")["percentile_n"]\
+            .to_list()
 
-# def closest_indices_df(my_df, ids = df["internal_id"]):
+    return percentiles
 
-#     my_df.columns = ids.cast(str) 
+print("3c: Topics")
+percentiles_topics = get_percentiles_fromdf_tolist_byrow(pl_topics)
 
-#     return my_df\
-#         .with_columns([df["internal_id"].alias("internal_id")])\
-#         .melt(id_vars=["internal_id"])\
-#         .sort("value", descending=True)\
-#         .group_by("internal_id")\
-#         .head(4)\
-#         .group_by("internal_id")\
-#         .apply(lambda group: group\
-#             .with_columns(pl.col("value")\
-#             .rank(method='ordinal', descending=True)\
-#             .alias("rank")))\
-#         .pivot(index='internal_id',columns="rank", values="variable")\
-#         .rename({'1': 'closest_0', '2': 'closest_1', '3': 'closest_2', '4': 'closest_3'})\
+print("4c: Thresholding Topics")
+pl_topics_thresh = pl_topics * (pl_topics > pl.Series(percentiles_topics))
 
+print("5: Calculating Closest Indices")
+def closest_indices_df(my_df, ids = df["internal_id"]):
+
+    my_df.columns = ids.cast(str) 
+
+    return my_df\
+        .with_columns([df["internal_id"].alias("internal_id")])\
+        .melt(id_vars=["internal_id"])\
+        .sort("value", descending=True)\
+        .group_by("internal_id")\
+        .head(4)\
+        .group_by("internal_id")\
+        .apply(lambda group: group\
+            .with_columns(pl.col("value")\
+            .rank(method='ordinal', descending=True)\
+            .alias("rank")))\
+        .pivot(index='internal_id',columns="rank", values="variable")\
+        .rename({'1': 'closest_0', '2': 'closest_1', '3': 'closest_2', '4': 'closest_3'})
+        
 def closest_indices_df_duds(my_df):
 
     return my_df\
@@ -130,7 +141,7 @@ def closest_indices_df_duds(my_df):
             .rank(method='ordinal', descending=True)\
             .alias("rank")))\
         .pivot(index='internal_id',columns="rank", values="variable")\
-        .rename({'1': 'closest_0', '2': 'closest_1', '3': 'closest_2', '4': 'closest_3'})
+        .rename({'1': 'closest_0', '2': 'closest_1', '3': 'closest_2', '4': 'closest_3'})  
 
 def fix_duds(ranks):
 
@@ -154,8 +165,10 @@ def fix_duds(ranks):
 
     ranks = ranks.filter(~pl.col("internal_id").is_in(list(pd.Series(duds).astype('int'))))
     
+    # return ranks.concat(duds_rank, how='vertical').sort("internal_id")
     return pl.concat([ranks,duds_rank], how='vertical').sort("internal_id")
 
-fix_duds(closest_people).write_parquet("closest_people_df.parquet")
-fix_duds(closest_places).write_parquet("closest_places_df.parquet")
-fix_duds(closest_topics).write_parquet("closest_topics_df.parquet")
+print("5c: Topics")
+closest_topics = closest_indices_df(pl_topics_thresh)
+
+closest_topics.write_parquet("closest_topics.parquet")
