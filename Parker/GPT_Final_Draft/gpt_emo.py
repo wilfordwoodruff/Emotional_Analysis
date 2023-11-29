@@ -3,9 +3,6 @@ import openai
 import pandas as pd
 import pkg_resources
 
-def spread_data(data):
-    df = data
-    return df
 
 def parse_data(row):
     #NEW, assumes it gets a whole row
