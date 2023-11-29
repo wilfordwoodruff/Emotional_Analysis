@@ -11,9 +11,8 @@ def parse_data(data):
         results.error_text = None
         results['error'] = ""
         results['error_text'] = ""
-
+        print(results)
         return results
-
     except:
         # create a blank dict and maybe have like an error row that is set to true.
         results = {
@@ -28,8 +27,8 @@ def parse_data(data):
             "error": True,
             "error_text": data
         }
+        print(results)
         return results
-        print(data)
 
 
 def generate_uuid_list(path_to_output_csv="output.csv"):
@@ -107,11 +106,11 @@ def analyze_emotions(api_key, text, prompt, i, retry=0):
             temperature=0.0,
             max_tokens=1000,
         )
-        print(f"{i} has been completed")
+        print(f"Row {i+1} has been completed")
     except Exception as e:
         if retry < 5:
             print(f"Retrying Row {i+1}: {retry}")
-            print(f"API request for row '{i}' failed. Reason: {str(e)}")
+            print(f"API request for row '{i+1}' failed. Reason: {str(e)}")
             analyze_emotions(api_key, text, prompt, i, retry+1)
         return f"Error: {str(e)}"
 
@@ -168,25 +167,24 @@ def main():
 
     # Check for output.csv, create, and export UUIDs
     uuid_list = generate_uuid_list()  # JUST UUIDS
-
+    print(uuid_list)
     # Clean input dataset to the two columns
     data = prep_data([uid_to_read, column_to_read], input_file_path)  # UUIDS AND CLEAN TEXT
-
+    print(data)
     # Filters out existing uuid from new request
     for uuid in uuid_list:
         data = data.drop(data.index[data['UUID'] == uuid])
-
+    print(data)
     data = run_rows(api_key, data, column_to_read, output_file_path)
 
     # THIS NEEDS MAJOR HELP
-    for i, row in data.iterrows():
-        print(row)
+    """ for i, row in data.iterrows():
         parsed_dict = parse_data(row['Emotions_Analysis']) # this is a parsed dict, that will have all the new data for each column but that doesnt exist yet, need to make sure these exist and then stick it on the correct index, then it will work.
         #data = data.concat(pd.DataFrame(parsed_dict, index=[i]), ignore_index=True)
-        if parsed_dict:
-            # Convert the parsed_dict to a DataFrame and concat it to the original data
-            parsed_df = pd.DataFrame(parsed_dict, index=[i])
-            data = pd.concat([data, parsed_df], axis=1)
+        print(parsed_dict)
+     """        
+
+
     data.to_csv('output.csv', mode='a+', encoding="utf-8", index=False, header=False)
     print("done")
     os.chdir(current_directory)
