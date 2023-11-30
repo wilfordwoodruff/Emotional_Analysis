@@ -92,3 +92,5 @@ topics_fixed = fix_duplicates(topics)
 people_fixed.write_parquet("closest_people_df.parquet")
 places_fixed.write_parquet("closest_places_df.parquet")
 topics_fixed.write_parquet("closest_topics_df.parquet")
+
+# people_fixed.write_csv("closest_people_df.csv")
