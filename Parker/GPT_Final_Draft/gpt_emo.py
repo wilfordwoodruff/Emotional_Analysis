@@ -3,9 +3,20 @@ import openai
 import pandas as pd
 import pkg_resources
 
+# CHECK THE MAIN FUNCTION FOR THE FLOW OF WHAT HAPPENS IN THIS SCRIPT
 
 def parse_data(row):
-    #NEW, assumes it gets a whole row
+    """
+    Description:
+    This function takes a row from the input data and extracts the 'Results' column. It then parses the data into a dictionary format, where keys are emotional categories (Neutral, Enthusiasm, Joy, Hope, Satisfaction, Sad, Anger, Fear), and values are corresponding scores.
+
+    Parameters:
+        row: A pandas DataFrame row containing the 'Results' column.
+    Returns:
+        A dictionary with emotional categories as keys and scores as values.
+    """
+    
+    
     data = row['Results']
     texts = data.split(',')
     texts = [text.replace('[', '').replace(']','').replace('{', '').replace('}', '').replace('=',':').split(':') for text in texts]
