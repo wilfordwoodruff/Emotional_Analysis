@@ -22,9 +22,9 @@ column_to_read=<COLUMN_NAME_TO_ANALYZE>
 
 uid_column=<COLUMN_NAME_FOR_UUID>
 
-**Replace** placeholders with your OpenAI API key and file paths.
+- **Replace** placeholders with your OpenAI API key and file paths.
 
-**Optionally** modify the requirements.txt file if additional Python packages are needed.
+- **Optionally** modify the requirements.txt file if additional Python packages are needed.
 
 
 Usage
