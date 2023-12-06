@@ -29,7 +29,7 @@ Usage
 -------------------------------------------------------------------------------
 Run the script using the following command in Windows PowerShell (or whatever shell you are using):
 
-python emotion_analysis.py
+python gpt_emo.py
 
 The script will process the data, analyze emotions, and append the results to the specified output CSV file.
 
